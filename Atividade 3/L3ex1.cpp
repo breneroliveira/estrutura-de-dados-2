@@ -140,6 +140,7 @@ int main() {
 
     do {
         system("cls");
+        
         cout << "*-----------------------*" << endl;
         cout << "|     MENU DE OPCOES    |" << endl;
         cout << "*-----------------------*" << endl;
