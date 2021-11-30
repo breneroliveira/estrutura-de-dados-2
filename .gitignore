@@ -1,0 +1,5 @@
+# Executable
+*.exe
+
+# Outfile
+saida.txt

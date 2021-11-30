@@ -133,6 +133,10 @@ arvore* remover(arvore **t, int v) {
     return *t;
 }
 
+void alturaSubaArvore() {
+
+}
+
 int main() {
     arvore *t = cria_arvore(); /* Cria uma arvore. */
     arvore *no_pai;
@@ -141,16 +145,18 @@ int main() {
     do {
         system("cls");
         
-        cout << "*-----------------------*" << endl;
-        cout << "|     MENU DE OPCOES    |" << endl;
-        cout << "*-----------------------*" << endl;
-        cout << "| 0 - Sair              |" << endl;
-        cout << "| 1 - Incluir           |" << endl;
-        cout << "| 2 - Mostrar           |" << endl;
-        cout << "| 3 - Remover           |" << endl;
-        cout << "*-----------------------*" << endl;
+        cout << "*--------------------------------*" << endl;
+        cout << "|         MENU DE OPCOES         |" << endl;
+        cout << "*--------------------------------*" << endl;
+        cout << "| 0 - Sair                       |" << endl;
+        cout << "| 1 - Incluir                    |" << endl;
+        cout << "| 2 - Mostrar                    |" << endl;
+        cout << "| 3 - Remover                    |" << endl;
+        cout << "| 4 - Altura das sub-arvores     |" << endl;
+        cout << "| 5 - Altura da arvore           |" << endl;
+        cout << "*--------------------------------*" << endl;
         
-        cout << "Sua escolha: ";
+        cout << "\nSua escolha: ";
         cin >> menu;
         fflush(stdin);
         
@@ -214,6 +220,22 @@ int main() {
                         cout << "VALOR REMOVIDO COM SUCESSO.";
                     }
                 }
+
+                getchar();
+            break;
+
+            case 4:
+                system("cls");
+
+
+
+                getchar();
+            break;
+
+            default:
+                system("cls");
+
+                cout << "Opcao invalida." << endl;
 
                 getchar();
             break;
