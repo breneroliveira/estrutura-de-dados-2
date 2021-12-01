@@ -261,8 +261,8 @@ int main() {
                         t = NULL;
                     } else {
                         /// Consulta se o valor pertence a arvore.
-                        if(buscaNo(t, num) != NULL) {
-                            remover(&t, num);
+                        if(buscaNo(t, num)) {
+                            remover(&t, buscaNo(t, num)->info);
                             cout << "\nVALOR REMOVIDO COM SUCESSO.";
                         } else
                             cout << "\nVALOR NAO PERTENCE A ARVORE.";
