@@ -133,40 +133,28 @@ arvore* remover(arvore **t, int v) {
     return *t;
 }
 
-void alturaSubArvore(arvore **t) {
-    arvore *aux = *t;
-
-    if(t == NULL) 
-        cout << "Arvore vazia" << endl;
+/// Criar a funcao.
+int alturaArvore(arvore *t) {
+    if (t == NULL)
+        return 1;
     else {
-        //int he = alturaSubArvore(t->sae);
-        //int hd = alturaSubArvore(t->sad);
-
-        aux = (*t)->sae;
-        while(aux->sad != NULL) {
-            aux = aux->sad;
-        }
-
-        int he = aux->sae;
-        int hd = aux->sad;
-        
-        cout << "Altura da sub-arvore a direita: " << hd + 1 << endl;
-        cout << "Altura da sub-arvore a esquerda: " << he + 1 << endl;
+        int he = 1 + alturaArvore(t->sae);
+        int hd = 1 + alturaArvore(t->sad);
+        if (he < hd)
+        return hd;
+    else
+        return he;
     }
 }
 
-int alturaArvore(arvore *t) {
-    if(t == NULL) 
-        return -1; /// Altura da arvore vazia.
-    else {
-        int he = alturaArvore(t->sae);
-        int hd = alturaArvore(t->sad);
-        
-        if(he < hd)
-            return hd + 1;
-        else
-            return he + 1;
+/// Criar a funcao.
+arvore* limpa_arvore(arvore *t) {
+    if(t != NULL) {
+        limpa_arvore(t->sae);
+        limpa_arvore(t->sad);
+        delete(t);
     }
+    return NULL;
 }
 
 int main() {
@@ -177,16 +165,16 @@ int main() {
     do {
         system("cls");
         
-        cout << "*--------------------------------*" << endl;
-        cout << "|         MENU DE OPCOES         |" << endl;
-        cout << "*--------------------------------*" << endl;
-        cout << "| 0 - Sair                       |" << endl;
-        cout << "| 1 - Incluir                    |" << endl;
-        cout << "| 2 - Mostrar                    |" << endl;
-        cout << "| 3 - Remover                    |" << endl;
-        cout << "| 4 - Altura das sub-arvores     |" << endl;
-        cout << "| 5 - Altura da arvore           |" << endl;
-        cout << "*--------------------------------*" << endl;
+        cout << "*------------------------------------*" << endl;
+        cout << "|           MENU DE OPCOES           |" << endl;
+        cout << "*------------------------------------*" << endl;
+        cout << "| 0 - Sair                           |" << endl;
+        cout << "| 1 - Incluir                        |" << endl;
+        cout << "| 2 - Mostrar                        |" << endl;
+        cout << "| 3 - Remover                        |" << endl;
+        cout << "| 4 - Mostrar altura da arvore       |" << endl;
+        cout << "| 5 - Limpar todos os nos da arvore  |" << endl;
+        cout << "*------------------------------------*" << endl;
         
         cout << "\nSua escolha: ";
         cin >> menu;
@@ -210,7 +198,7 @@ int main() {
                 fflush(stdin);
 
                 inserir(&t, num);
-                cout << "VALOR INCLUIDO COM SUCESSO.";
+                cout << "\nVALOR INCLUIDO COM SUCESSO.";
 
                 getchar();
             break;
@@ -219,7 +207,7 @@ int main() {
                 system("cls");
 
                 if(testa_vazia(t)) /* Verifica se a arvore esta vazia. */
-                    cout << "\n\nArvore vazia.\n";
+                    cout << "Arvore vazia.\n";
                 else {
                     cout << "ELEMENTOS NA ARVORE EM PRE-ORDEM: " << endl;
                     mostra(t);
@@ -236,20 +224,19 @@ int main() {
                 system("cls");
 
                 if(testa_vazia(t)) /* Verifica se a arvore esta vazia. */
-                    cout << "\n\nArvore vazia.\n";
+                    cout << "Arvore vazia.\n";
                 else {
                     cout << "Informe o valor a ser removido: ";
                     cin >> num;
                     fflush(stdin);
 
                     if(t->sae == NULL && t->sad == NULL) {
-                        delete (t);
+                        delete(t);
                         t = NULL;
                     } else {
                         /// Consulta se o valor pertence a arvore.
-
                         remover(&t, num);
-                        cout << "VALOR REMOVIDO COM SUCESSO.";
+                        cout << "\nVALOR REMOVIDO COM SUCESSO.";
                     }
                 }
 
@@ -259,9 +246,25 @@ int main() {
             case 4:
                 system("cls");
 
-                //cout << "Altura da sub-arvore a direita: " << alturaSubArvore(t) << endl;
-                //cout << "Altura da sub-arvore a esquerda: " << alturaSubArvore(t) << endl;
-                alturaSubArvore(t);
+                if(testa_vazia(t)) /* Verifica se a arvore esta vazia. */
+                    cout << "Arvore vazia.\n";
+                else {
+                    cout << "ALTURA SAE: " << endl;
+                    if(t->sae == NULL)
+                        cout << "-1" << endl;
+                    else
+                        cout << alturaArvore(t->sae);
+                    cout << "\nALTURA SAD: " << endl;
+                    if(t->sad == NULL)
+                        cout << "-1" << endl;
+                    else
+                        cout << alturaArvore(t->sad);
+                    cout << "\nALTURA DA ARVORE: " << endl;
+                    if(alturaArvore(t->sae) > alturaArvore(t->sad))
+                        cout << alturaArvore(t->sae);
+                    else
+                        cout << alturaArvore(t->sad);
+                }
 
                 getchar();
             break;
@@ -269,7 +272,12 @@ int main() {
             case 5:
                 system("cls");
 
-                cout << "Altura da arvore: " << alturaArvore(t) << endl;
+                if(testa_vazia(t)) /* Verifica se a arvore esta vazia. */
+                    cout << "Arvore vazia.\n";
+                else {
+                    t = limpa_arvore(t);
+                    cout << "Todos os nos foram eliminados. Arvore vazia.";
+                }
 
                 getchar();
             break;
