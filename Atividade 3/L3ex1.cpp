@@ -133,8 +133,40 @@ arvore* remover(arvore **t, int v) {
     return *t;
 }
 
-void alturaSubaArvore() {
+void alturaSubArvore(arvore **t) {
+    arvore *aux = *t;
 
+    if(t == NULL) 
+        cout << "Arvore vazia" << endl;
+    else {
+        //int he = alturaSubArvore(t->sae);
+        //int hd = alturaSubArvore(t->sad);
+
+        aux = (*t)->sae;
+        while(aux->sad != NULL) {
+            aux = aux->sad;
+        }
+
+        int he = aux->sae;
+        int hd = aux->sad;
+        
+        cout << "Altura da sub-arvore a direita: " << hd + 1 << endl;
+        cout << "Altura da sub-arvore a esquerda: " << he + 1 << endl;
+    }
+}
+
+int alturaArvore(arvore *t) {
+    if(t == NULL) 
+        return -1; /// Altura da arvore vazia.
+    else {
+        int he = alturaArvore(t->sae);
+        int hd = alturaArvore(t->sad);
+        
+        if(he < hd)
+            return hd + 1;
+        else
+            return he + 1;
+    }
 }
 
 int main() {
@@ -227,7 +259,17 @@ int main() {
             case 4:
                 system("cls");
 
+                //cout << "Altura da sub-arvore a direita: " << alturaSubArvore(t) << endl;
+                //cout << "Altura da sub-arvore a esquerda: " << alturaSubArvore(t) << endl;
+                alturaSubArvore(t);
 
+                getchar();
+            break;
+            
+            case 5:
+                system("cls");
+
+                cout << "Altura da arvore: " << alturaArvore(t) << endl;
 
                 getchar();
             break;
