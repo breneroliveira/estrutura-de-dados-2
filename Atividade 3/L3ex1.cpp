@@ -76,6 +76,20 @@ void mostra_3(arvore *t) {
     cout << ">";
 }
 
+arvore* buscaNo(arvore *t, int c) {
+    arvore *aux;
+    if(testa_vazia(t))
+        return NULL; /* Arvore vazia: nao encontrou. */
+    else if(t->info == c)
+        return t;
+    else {
+        aux = buscaNo(t->sae, c); /* Busca na sae. */
+        if(aux == NULL)
+            aux = buscaNo(t->sad, c); /* Busca na sad. */
+        return aux;
+    }
+}
+
 /* Funcao que insere um dado na arvore. */
 void inserir(arvore **t, int v) {
     /* Essa funcao insere os elementos de forma recursiva. */
@@ -133,7 +147,6 @@ arvore* remover(arvore **t, int v) {
     return *t;
 }
 
-/// Criar a funcao.
 int alturaArvore(arvore *t) {
     if (t == NULL)
         return 1;
@@ -147,7 +160,6 @@ int alturaArvore(arvore *t) {
     }
 }
 
-/// Criar a funcao.
 arvore* limpa_arvore(arvore *t) {
     if(t != NULL) {
         limpa_arvore(t->sae);
@@ -155,6 +167,19 @@ arvore* limpa_arvore(arvore *t) {
         delete(t);
     }
     return NULL;
+}
+
+void acha_nivel(arvore *t, int v, int nivel) {
+    if(!testa_vazia(t)) {
+        nivel++;
+        if(t->info == v) {
+            cout << "\nO valor " << t->info << " esta no nivel ";
+            cout << nivel << "." << endl;
+        }
+        acha_nivel(t->sae, v, nivel);
+        acha_nivel(t->sad, v, nivel);
+        nivel--;
+    }
 }
 
 int main() {
@@ -174,6 +199,7 @@ int main() {
         cout << "| 3 - Remover                        |" << endl;
         cout << "| 4 - Mostrar altura da arvore       |" << endl;
         cout << "| 5 - Limpar todos os nos da arvore  |" << endl;
+        cout << "| 6 - Buscar nivel                   |" << endl;
         cout << "*------------------------------------*" << endl;
         
         cout << "\nSua escolha: ";
@@ -235,8 +261,11 @@ int main() {
                         t = NULL;
                     } else {
                         /// Consulta se o valor pertence a arvore.
-                        remover(&t, num);
-                        cout << "\nVALOR REMOVIDO COM SUCESSO.";
+                        if(buscaNo(t, num) != NULL) {
+                            remover(&t, num);
+                            cout << "\nVALOR REMOVIDO COM SUCESSO.";
+                        } else
+                            cout << "\nVALOR NAO PERTENCE A ARVORE.";
                     }
                 }
 
@@ -277,6 +306,25 @@ int main() {
                 else {
                     t = limpa_arvore(t);
                     cout << "Todos os nos foram eliminados. Arvore vazia.";
+                }
+
+                getchar();
+            break;
+
+            case 6:
+                system("cls");
+
+                if(testa_vazia(t)) /* Verifica se a arvore esta vazia. */
+                    cout << "Arvore vazia.\n";
+                else {
+                    cout << "Informe o valor a ser consultado o nivel: ";
+                    cin >> num;
+                    fflush(stdin);
+                    /// Consulta se o valor pertence a arvore.
+                    if(buscaNo(t, num)) {
+                        acha_nivel(t, num, -1);
+                    } else
+                        cout << "\nVALOR NAO PERTENCE A ARVORE.";
                 }
 
                 getchar();
