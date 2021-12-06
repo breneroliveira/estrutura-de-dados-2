@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>   
 
 using namespace std;
 
@@ -18,7 +19,7 @@ void inserir(arvore **p, int num);
 void mostra(arvore *p);
 void mostra_em_ordem(arvore *p);
 void mostra_pos(arvore *p);
-void mostra_paragrafacao(arvore *p);
+void mostra_paragrafacao(arvore *t, int nivel);
 arvore* remover(arvore **p, int num);
 arvore * limpa_arvore(arvore *p);
 int altura(arvore *p);
@@ -29,6 +30,11 @@ arvore * rotacionar_esq_dir(arvore *p);
 arvore * rotacionar_dir_esq(arvore *p);
 arvore * rotacionar_dir_dir(arvore *p);
 arvore * balancear(arvore *p);
+int numeroNos(arvore *p);
+int acha_nivel(arvore *t, int v, int nivel);
+int nivel_arvore(arvore *t, int v, int nivel);
+
+void BinarySearchTree(arvore *p, int s);
 
 main() {
     arvore *t = cria_arvore();
@@ -43,6 +49,7 @@ main() {
         cout << "3 - EXCLUIR" << endl;
         cout << "4 - LIMPA ARVORE" << endl;
         cout << "5 - ALTURA DA ARVORE" << endl;
+        cout << "6 - ACHA NIVEL" << endl;
        
         cout << "Sua escolha: ";
         cin >> menu;
@@ -86,7 +93,7 @@ main() {
                     cout << "\n\nELEMENTOS NA ARVORE POS-FIXA: " << endl;
                     mostra_pos(t);
                     cout << "\n\nELEMENTOS NA ARVORE REPRESENTADOS POR PARAGRAFACAO: " << endl;
-                    mostra_paragrafacao(t);
+                    mostra_paragrafacao(t, -1);
                 }
 
                 getchar();
@@ -128,6 +135,17 @@ main() {
                     cout << "ARVORE VAZIA.";
                 else {
                     cout << "ALTURA DA ARVORE: " << altura(t) << endl;
+                }
+                
+                getchar();
+            break;
+            case 6 :
+                system("cls");
+              
+                if(testa_vazia(t))
+                    cout << "ARVORE VAZIA.";
+                else {
+                    cout << "ALTURA DA ARVORE: " << nivel_arvore(t, 3, 0) << endl;
                 }
                 
                 getchar();
@@ -200,14 +218,44 @@ void mostra_pos(arvore *p) {
     cout << ">";
 }
 
-void mostra_paragrafacao(arvore *p) {
-    cout << "<";
-    if(!testa_vazia(p)) {
-        mostra_paragrafacao(p->sae);
-        mostra_paragrafacao (p->sad);
-        cout << p->info;
+int numeroNos(arvore *p) {
+    if(p == NULL)
+        return 0;
+    else
+        return 1 + p->sae->info + p->sad->info;
+}
+
+int nivel_arvore(arvore *t, int v, int nivel) {
+    if(t == NULL)
+        return 0;
+    else {
+        if(v == t->info)
+            return nivel;
+        else {
+            nivel++;
+
+            if(v < t->info)
+                return nivel_arvore(t->sae, v, nivel);
+            else
+                return nivel_arvore(t->sad, v, nivel);
+        }
     }
-    cout << ">";
+}
+
+void mostra_paragrafacao(arvore *t, int nivel) {
+    int cont = 0;
+    if(!testa_vazia(t)){
+        nivel++;
+        while(cont < nivel) {
+            cout << ". ";
+            cont++;
+        }
+        cout << t->info << endl;
+        
+        mostra_paragrafacao(t->sae, nivel);
+        mostra_paragrafacao(t->sad, nivel);
+        nivel--;
+    }
 }
 
 arvore* remover(arvore **p, int num) {
