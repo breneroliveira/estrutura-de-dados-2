@@ -50,7 +50,7 @@ main() {
         cout << "4 - LIMPA ARVORE" << endl;
         cout << "5 - ALTURA DA ARVORE" << endl;
         cout << "6 - ACHA NIVEL" << endl;
-       
+
         cout << "Sua escolha: ";
         cin >> menu;
         fflush(stdin);
