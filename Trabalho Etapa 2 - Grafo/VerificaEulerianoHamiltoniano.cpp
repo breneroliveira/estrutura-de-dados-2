@@ -28,6 +28,7 @@ void mostrarAdjacente(int m[][coluna], int vertice, int qtdVertices);
 int mostrarGrau(int m[][coluna], int vertice, int qtdVertices);
 int verificarConexo(int m[][coluna], int qtdVertices);
 void verificaEuleriano(int m[][coluna], int qtdVertices);
+void verificaHamiltoniano(int m[][coluna], int qtdVertices);
 
 int main() {
     setlocale(LC_ALL, "Portuguese");
@@ -43,30 +44,30 @@ int main() {
         system("cls");
         cout << "****************************************************************" << endl;
         cout << "* 0 - Sair                                                     *" << endl;
-        cout << "* 1 - Informar o número de vertices a ser utilizado            *" << endl;
+        cout << "* 1 - Informar o numero de vertices a ser utilizado            *" << endl;
         cout << "* 2 - Incluir aresta (vertice inicial e final)                 *" << endl;
         cout << "* 3 - Mostrar matriz                                           *" << endl;
         cout << "* 4 - Remover aresta (vertice inicial e final)                 *" << endl;
         cout << "* 5 - Informar um vertice e apresentar seus adjacentes         *" << endl;
         cout << "* 6 - Informar um vertice e informar seu grau                  *" << endl;
-        cout << "* 7 - Verificar se o grafo é conexo                            *" << endl;
-        cout << "* 8 - Verificar se o grafo é euleriano, semi-euleriano ou não  *" << endl;
+        cout << "* 7 - Verificar se o grafo e conexo                            *" << endl;
+        cout << "* 8 - Verificar se o grafo e euleriano, semi-euleriano ou nao  *" << endl;
         cout << "****************************************************************" << endl;
-        cout << "Sua escolha: ";
+        cout << "\nSua escolha: ";
         cin >> menu;
         fflush(stdin);
         switch (menu){
             case 0:
                 system("cls");
-                cout << "OPÇÃO 0 - SAIR" << endl << endl;
-                cout << "PROGRAMA FINALIZADO!";
+                cout << "OPCAO 0 - SAIR" << endl << endl;
+                cout << "PROGRAMA FINALIZADO.";
                 getchar();
                 break;
 
             case 1:
                 system("cls");
-                cout << "OPÇÃO 1 - INFORMAR A QUANTIDADE DE VERTICES A SER UTILIZADO" << endl << endl;
-                cout << "Informe a quantidade de vértices: ";
+                cout << "OPCAO 1 - INFORMAR A QUANTIDADE DE VERTICES A SER UTILIZADO" << endl << endl;
+                cout << "Informe a quantidade de vertices: ";
                 cin >> qtdVertices;
                 fflush(stdin);
                 leu1 = 1;
@@ -75,7 +76,7 @@ int main() {
 
             case 2:
                 system("cls");
-                cout << "OPÇÃO 2 - INCLUIR ARESTA (VERTICE INICIAL E FINAL)" << endl << endl;
+                cout << "OPCAO 2 - INCLUIR ARESTA (VERTICE INICIAL E FINAL)" << endl << endl;
 
                 if(leu1 == 1){
                     cout << "Informe o vertice inicial: ";
@@ -91,28 +92,28 @@ int main() {
 
                     cout << endl;
                 } else
-                    cout << "Insira o número de vértices" << endl;
+                    cout << "Insira o numero de vertices" << endl;
 
                 getchar();
                 break;
 
             case 3:
                 system("cls");
-                cout << "OPÇÃO 3 - MOSTRAR MATRIZ" << endl << endl;
+                cout << "OPCAO 3 - MOSTRAR MATRIZ" << endl << endl;
 
                 if(leu1 == 1 && leu2 == 1)
                     mostrar(m, qtdVertices);
                 else if(leu1 == 1 && leu2 == 0)
                     cout << "Insira ao menos uma aresta " << endl;
                 else
-                    cout << "Execute a opção 1 e 2 primeiro" << endl;
+                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
 
                 getchar();
                 break;
 
             case 4:
                 system("cls");
-                cout << "OPÇÃO 4 - REMOVER ARESTA (VERTICE INICIAL E FINAL)" << endl << endl;
+                cout << "OPCAO 4 - REMOVER ARESTA (VERTICE INICIAL E FINAL)" << endl << endl;
 
                 if(leu1 == 1 && leu2 == 1){
                     cout << "Informe o vertice inicial: ";
@@ -128,14 +129,14 @@ int main() {
                 }else if(leu1 == 1 && leu2 == 0)
                     cout << "Insira ao menos uma aresta " << endl;
                 else
-                    cout << "Execute a opção 1 e 2 primeiro" << endl;
+                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
 
                 getchar();
                 break;
 
             case 5:
                 system("cls");
-                cout << "OPÇÃO 5 - INFORMAR UM VERTICE E APRESENTAR SEUS ADJACENTES" << endl << endl;
+                cout << "OPCAO 5 - INFORMAR UM VERTICE E APRESENTAR SEUS ADJACENTES" << endl << endl;
 
                 if(leu1 == 1 && leu2 == 1){
                     cout << "Informe o vertice: ";
@@ -148,14 +149,14 @@ int main() {
                 }else if(leu1 == 1 && leu2 == 0)
                     cout << "Insira ao menos uma aresta " << endl;
                 else
-                    cout << "Execute a opção 1 e 2 primeiro" << endl;
+                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
 
                 getchar();
                 break;
 
             case 6:
                 system("cls");
-                cout << "OPÇÃO 6 - INFORMAR UM VERTICE E INFORMAR SEU GRAU" << endl << endl;
+                cout << "OPCAO 6 - INFORMAR UM VERTICE E INFORMAR SEU GRAU" << endl << endl;
 
                 if(leu1 == 1 && leu2 == 1){
                     cout << "Informe o vertice: ";
@@ -170,14 +171,14 @@ int main() {
                 }else if(leu1 == 1 && leu2 == 0)
                     cout << "Insira ao menos uma aresta " << endl;
                 else
-                    cout << "Execute a opção 1 e 2 primeiro" << endl;
+                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
 
                 getchar();
                 break;
 
             case 7:
                 system("cls");
-                cout << "OPÇÃO 7 - VERIFICAR SE O GRAFO É CONEXO" << endl << endl;
+                cout << "OPCAO 7 - VERIFICAR SE O GRAFO E CONEXO" << endl << endl;
 
                 if(leu1 == 1 && leu2 == 2){
                     if((verificarConexo(m, qtdVertices) / 2) < qtdVertices - 1)
@@ -187,14 +188,14 @@ int main() {
                 } else if(leu1 == 1 && leu2 == 0)
                     cout << "Insira ao menos uma aresta " << endl;
                 else
-                    cout << "Execute a opção 1 e 2 primeiro" << endl;
+                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
 
                 getchar();
                 break;
 
             case 8:
                 system("cls");
-                cout << "OPÇÃO 8 - VERIFICAR SE O GRAFO É EULERIANO, SEMI-EULERIANO OU NÃO" << endl << endl;
+                cout << "OPCAO 8 - VERIFICAR SE O GRAFO E EULERIANO, SEMI-EULERIANO OU NAO" << endl << endl;
                 verificaEuleriano(m, qtdVertices);
                 getchar();
                 break;
@@ -221,7 +222,7 @@ void mostrar(int m[][coluna], int qtdVertices){
 
 void removerAresta(int m[][coluna], int vInicial, int vFinal){
     if(m[vInicial][vFinal] = 0){
-        cout << "A aresta informada não existe" << endl;
+        cout << "A aresta informada nao existe" << endl;
     }else{
         m[vInicial][vFinal] = 0;
         m[vFinal][vInicial] = 0;
@@ -267,12 +268,12 @@ int verificarConexo(int m[][coluna], int qtdVertices){
 
 //0-1; 1-2; 1-4; 2-3; 3-4; 4-5;
 
-void verificaEuleriano(int m[][coluna], int qtdVertices){
+void verificaEuleriano(int m[][coluna], int qtdVertices) {
     int grau, grauPar = 0, grauImpar = 0;
 
-    for(int l = 0; l < qtdVertices; l++){
+    for(int l = 0; l < qtdVertices; l++) {
         grau = 0;
-        for(int c = 0; c < qtdVertices; c++){
+        for(int c = 0; c < qtdVertices; c++) {
             if(m[l][c] == 1)
                 grau++;
         }
@@ -283,11 +284,35 @@ void verificaEuleriano(int m[][coluna], int qtdVertices){
     }
 
     if(grauImpar == 0)
-        cout << "O GRAFO É EULERIANO!" << endl;
+        cout << "O GRAFO E EULERIANO." << endl;
     else if(grauImpar == 2)
-        cout << "O GRAFO É SEMI-EULERIANO" << endl;
+        cout << "O GRAFO E SEMI-EULERIANO." << endl;
     else
-        cout << "O GRAFO NÃO É EULERIANO" << endl;
+        cout << "O GRAFO NAO E EULERIANO." << endl;
+
+}
+
+void verificaHamiltoniano(int m[][coluna], int qtdVertices) {
+    int grau, grauPar = 0, grauImpar = 0;
+
+    for(int l = 0; l < qtdVertices; l++) {
+        grau = 0;
+        for(int c = 0; c < qtdVertices; c++) {
+            if(m[l][c] == 1)
+                grau++;
+        }
+        if(grau >= 2)
+            cout << "O GRAFO E HAMILTONIANO." << endl;
+        else
+            cout << "O GRAFO NAO E HAMILTONIANO." << endl;
+    }
+
+    if(grauImpar == 0)
+        cout << "O GRAFO E EULERIANO." << endl;
+    else if(grauImpar == 2)
+        cout << "O GRAFO E SEMI-EULERIANO." << endl;
+    else
+        cout << "O GRAFO NAO E EULERIANO." << endl;
 
 }
 
