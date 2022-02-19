@@ -1,334 +1,313 @@
-#include<iostream>
-#include <clocale>
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include <time.h>
-
-#define linha 10
-#define coluna 10
-
-/// O que foi feito:
-/// Foi implementada a função verificarConexo2, ela tem um problema pois o tamanho da matris influencia;
-/// Nesse sentido, foi adicionado um case 10 para que seja informado a quantidade de vértices a ser inserido;
-/// Com isso, esse valor foi passado para a nova função que percorre até o valor de vértices informado.
-
-/// O que precisa arrumar:
-/// Arrumar o case 10 para 1
-/// Arrumar os tamanhos, no caso criando a matriz e tudo mais a partir da quantia de vértices informado;
-/// Arrumar para que seja possível acionar as outras opções somente quando a quantia de vértices for informada.
-
+#include <iostream> 
 
 using namespace std;
 
-void inserirAresta(int m[][coluna], int vInicial, int vFinal);
-void mostrar(int m[][coluna], int qtdVertices);
-void removerAresta(int m[][coluna], int vInicial, int vFinal);
-void mostrarAdjacente(int m[][coluna], int vertice, int qtdVertices);
-int mostrarGrau(int m[][coluna], int vertice, int qtdVertices);
-int verificarConexo(int m[][coluna], int qtdVertices);
-void verificaEuleriano(int m[][coluna], int qtdVertices);
-void verificaHamiltoniano(int m[][coluna], int qtdVertices);
+#define VERTICES_MAXIMOS 5 // MÁXIMO DE VÉRTICES DO GRAFO, SE FOR ALTERAR O GRAFO PRECISA ALTERAR ESTA VARIÁVEL TAMBÉM
+
+// Estrutura que define cada Vértice do Grafo
+typedef struct NO {
+	char id_vertice;
+	int numero_de_vizinhos;
+	struct NO* vizinhos[VERTICES_MAXIMOS];
+	bool vertice_visitado;
+} *VERTICE;
+
+VERTICE solucao_ciclo_hamiltoniano[VERTICES_MAXIMOS]; // Array que irá guardar a solução do ciclo hamiltoniano
+
+// Cria Vértice e retorna
+VERTICE criaVertice(char id_vertice) {
+	NO *novoVertice = new NO();
+	novoVertice->id_vertice = id_vertice;
+	novoVertice->numero_de_vizinhos = 0;
+	novoVertice->vertice_visitado = false;
+	for (int i = 0; i < VERTICES_MAXIMOS; i++) {
+		novoVertice->vizinhos[i] = NULL;
+	}
+	return novoVertice;
+}
+
+// Liga os vértices passados como parâmetro
+bool ligaVertices(VERTICE v1, VERTICE v2) {
+	int aux = 0;
+	while(v1->vizinhos[aux] != NULL) { // Busca a primeira posição 'vazia'(NULL) dos vizinhos
+		aux++;
+	}
+	v1->vizinhos[aux] = v2; // Adiciona o novo vizinho a lista de vizinhos
+	aux = 0;
+	while(v2->vizinhos[aux] != NULL) { // Busca a primeira posição 'vazia'(NULL) dos vizinhos
+		aux++;
+	}
+	v2->vizinhos[aux] = v1; // Adiciona o novo vizinho a lista de vizinhos
+	v1->numero_de_vizinhos++; // Incrementa o número de vizinhos
+	v2->numero_de_vizinhos++; // Incrementa o número de vizinhos
+}
+
+bool cicloHamiltonianoAuxiliar(int aux) {
+
+	if(aux == VERTICES_MAXIMOS) {
+		for (int i = 0; i < solucao_ciclo_hamiltoniano[aux-1]->numero_de_vizinhos; i++) {
+			if(solucao_ciclo_hamiltoniano[aux-1]->vizinhos[i] == solucao_ciclo_hamiltoniano[0]) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	VERTICE s = solucao_ciclo_hamiltoniano[aux-1]; // Auxiliar para simplificar o código
+
+	for (int i = 0; i < s->numero_de_vizinhos; i++) { // Percorre todos os vizinhos do vértice de posição aux-1 no array solução
+		if(s->vizinhos[i]->vertice_visitado == false) {
+			s->vizinhos[i]->vertice_visitado = true;
+			solucao_ciclo_hamiltoniano[aux] = s->vizinhos[i];
+			if(cicloHamiltonianoAuxiliar(aux+1) == true) {
+				return true;
+			}
+			s->vizinhos[i]->vertice_visitado = false;
+		}
+	}
+
+	return false;
+}
+
+bool cicloHamiltoniano(VERTICE grafo[VERTICES_MAXIMOS]) {
+	grafo[0]->vertice_visitado = true; // Marca a posição inicial como visitada
+	solucao_ciclo_hamiltoniano[0] = grafo[0]; // Array que irá guardar a solução do ciclo
+	return cicloHamiltonianoAuxiliar(1);
+}
+
+void verificaEuleriano(VERTICE GRAFO[VERTICES_MAXIMOS]) {
+	int cont_impar = 0;
+
+	for(int i = 0; i < VERTICES_MAXIMOS; i++) {
+		if(GRAFO[i]->numero_de_vizinhos%2 != 0)
+			cont_impar++;
+	}
+
+	if(cont_impar == 0)
+		cout << "Eh um Grafo Euleriano.\n\n";
+	else if(cont_impar == 2)
+		cout << "Eh um Grafo Semi-Euleriano.\n\n";
+	else
+		cout << "Nao eh um Grafo Euleriano.\n\n";
+}
 
 int main() {
-    setlocale(LC_ALL, "Portuguese");
 
-    srand(time(NULL));
+    // Grafo conjunto de vértices em um array
+	VERTICE GRAFO[VERTICES_MAXIMOS];
 
-    int m[linha][coluna] = {};
-    int menu = -1, leu1 = 0, leu2 = 0;
-    int verticeInicial, verticeFinal, qtdVertices;
-    int vertice;
+	int menu = -1;
 
-    do{
+    do {
         system("cls");
-        cout << "****************************************************************" << endl;
-        cout << "* 0 - Sair                                                     *" << endl;
-        cout << "* 1 - Informar o numero de vertices a ser utilizado            *" << endl;
-        cout << "* 2 - Incluir aresta (vertice inicial e final)                 *" << endl;
-        cout << "* 3 - Mostrar matriz                                           *" << endl;
-        cout << "* 4 - Remover aresta (vertice inicial e final)                 *" << endl;
-        cout << "* 5 - Informar um vertice e apresentar seus adjacentes         *" << endl;
-        cout << "* 6 - Informar um vertice e informar seu grau                  *" << endl;
-        cout << "* 7 - Verificar se o grafo e conexo                            *" << endl;
-        cout << "* 8 - Verificar se o grafo e euleriano, semi-euleriano ou nao  *" << endl;
-        cout << "****************************************************************" << endl;
-        cout << "\nSua escolha: ";
+
+        cout << "0 - Sair;" << endl;
+        cout << "1 - Grafo Euleriano (7 vertices);" << endl;
+        cout << "2 - Grafo Semi-Euleriano (6 vertices);" << endl;
+        cout << "3 - Grafo Nao Euleriano (5 vertices);" << endl;
+        cout << "4 - Grafo Hamiltoniano (5 vertices);" << endl;
+        cout << "5 - Grafo Hamiltoniano (5 vertices);" << endl;
+        cout << "6 - Grafo Nao Hamiltoniano (6 vertices)." << endl;
+
+        cout << "\nEscolha um grafo para ser testado: ";
         cin >> menu;
         fflush(stdin);
-        switch (menu){
-            case 0:
+
+		int cont_impar = 0;
+
+        switch(menu) {
+            case 0 :
                 system("cls");
-                cout << "OPCAO 0 - SAIR" << endl << endl;
-                cout << "PROGRAMA FINALIZADO.";
-                getchar();
-                break;
 
-            case 1:
+                cout << "Programa finalizado.\n";
+
+            break;
+            case 1 :
                 system("cls");
-                cout << "OPCAO 1 - INFORMAR A QUANTIDADE DE VERTICES A SER UTILIZADO" << endl << endl;
-                cout << "Informe a quantidade de vertices: ";
-                cin >> qtdVertices;
-                fflush(stdin);
-                leu1 = 1;
-                getchar();
-                break;
+                
+				GRAFO[0] = criaVertice('A');
+				GRAFO[1] = criaVertice('B');
+				GRAFO[2] = criaVertice('C');
+				GRAFO[3] = criaVertice('D');
+				GRAFO[4] = criaVertice('E');
+				GRAFO[5] = criaVertice('F');
+				GRAFO[6] = criaVertice('G');
 
-            case 2:
+				ligaVertices(GRAFO[0], GRAFO[1]);
+				ligaVertices(GRAFO[1], GRAFO[2]);
+				ligaVertices(GRAFO[2], GRAFO[3]);
+				ligaVertices(GRAFO[3], GRAFO[4]);
+				ligaVertices(GRAFO[4], GRAFO[5]);
+				ligaVertices(GRAFO[5], GRAFO[0]);
+				ligaVertices(GRAFO[1], GRAFO[5]);
+				ligaVertices(GRAFO[2], GRAFO[4]);
+				ligaVertices(GRAFO[1], GRAFO[6]);
+				ligaVertices(GRAFO[2], GRAFO[6]);
+				ligaVertices(GRAFO[4], GRAFO[6]);
+				ligaVertices(GRAFO[5], GRAFO[6]);
+
+				verificaEuleriano(GRAFO);
+
+                system("pause");
+            break;
+            case 2 :
                 system("cls");
-                cout << "OPCAO 2 - INCLUIR ARESTA (VERTICE INICIAL E FINAL)" << endl << endl;
+                
+				GRAFO[0] = criaVertice('A');
+				GRAFO[1] = criaVertice('B');
+				GRAFO[2] = criaVertice('C');
+				GRAFO[3] = criaVertice('D');
+				GRAFO[4] = criaVertice('E');
+				GRAFO[5] = criaVertice('F');
 
-                if(leu1 == 1){
-                    cout << "Informe o vertice inicial: ";
-                    cin >> verticeInicial;
-                    fflush(stdin);
-                    cout << "Informe o vertice final: ";
-                    cin >> verticeFinal;
-                    fflush(stdin);
+				ligaVertices(GRAFO[0], GRAFO[1]);
+				ligaVertices(GRAFO[1], GRAFO[2]);
+				ligaVertices(GRAFO[2], GRAFO[3]);
+				ligaVertices(GRAFO[3], GRAFO[4]);
+				ligaVertices(GRAFO[4], GRAFO[0]);
+				ligaVertices(GRAFO[1], GRAFO[3]);
+				ligaVertices(GRAFO[0], GRAFO[5]);
+				ligaVertices(GRAFO[1], GRAFO[5]);
+				ligaVertices(GRAFO[3], GRAFO[5]);
+				ligaVertices(GRAFO[4], GRAFO[5]);
 
-                    inserirAresta(m, verticeInicial, verticeFinal);
+				verificaEuleriano(GRAFO);
 
-                    leu2 = 1;
-
-                    cout << endl;
-                } else
-                    cout << "Insira o numero de vertices" << endl;
-
-                getchar();
-                break;
-
-            case 3:
+                system("pause");
+            break;
+            case 3 :
                 system("cls");
-                cout << "OPCAO 3 - MOSTRAR MATRIZ" << endl << endl;
+              
+				GRAFO[0] = criaVertice('A');
+				GRAFO[1] = criaVertice('B');
+				GRAFO[2] = criaVertice('C');
+				GRAFO[3] = criaVertice('D');
+				GRAFO[4] = criaVertice('E');
 
-                if(leu1 == 1 && leu2 == 1)
-                    mostrar(m, qtdVertices);
-                else if(leu1 == 1 && leu2 == 0)
-                    cout << "Insira ao menos uma aresta " << endl;
-                else
-                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
+				ligaVertices(GRAFO[0], GRAFO[1]);
+				ligaVertices(GRAFO[1], GRAFO[2]);
+				ligaVertices(GRAFO[2], GRAFO[3]);
+				ligaVertices(GRAFO[3], GRAFO[0]);
+				ligaVertices(GRAFO[0], GRAFO[4]);
+				ligaVertices(GRAFO[1], GRAFO[4]);
+				ligaVertices(GRAFO[2], GRAFO[4]);
+				ligaVertices(GRAFO[3], GRAFO[4]);
 
-                getchar();
-                break;
-
-            case 4:
+				verificaEuleriano(GRAFO);
+                
+                system("pause");
+            break;
+            case 4 :
                 system("cls");
-                cout << "OPCAO 4 - REMOVER ARESTA (VERTICE INICIAL E FINAL)" << endl << endl;
+              
+				GRAFO[0] = criaVertice('A');
+				GRAFO[1] = criaVertice('B');
+				GRAFO[2] = criaVertice('C');
+				GRAFO[3] = criaVertice('D');
+				GRAFO[4] = criaVertice('E');
+	
+				ligaVertices(GRAFO[0], GRAFO[1]);
+				ligaVertices(GRAFO[1], GRAFO[2]);
+				ligaVertices(GRAFO[2], GRAFO[3]);
+				ligaVertices(GRAFO[3], GRAFO[4]);
+				ligaVertices(GRAFO[4], GRAFO[0]);
+				ligaVertices(GRAFO[0], GRAFO[2]);
+				ligaVertices(GRAFO[0], GRAFO[3]);
+				ligaVertices(GRAFO[1], GRAFO[4]);
+				ligaVertices(GRAFO[1], GRAFO[3]);
+				ligaVertices(GRAFO[2], GRAFO[4]);
 
-                if(leu1 == 1 && leu2 == 1){
-                    cout << "Informe o vertice inicial: ";
-                    cin >> verticeInicial;
-                    fflush(stdin);
-                    cout << "Informe o vertice final: ";
-                    cin >> verticeFinal;
-                    fflush(stdin);
+				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
+				}
 
-                    removerAresta(m, verticeInicial, verticeFinal);
+				if(cicloHamiltoniano(GRAFO)) {
+					cout << "Eh um Grafo Hamiltoniano.\n\n";
 
-                    cout << endl;
-                }else if(leu1 == 1 && leu2 == 0)
-                    cout << "Insira ao menos uma aresta " << endl;
-                else
-                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
-
-                getchar();
-                break;
-
-            case 5:
+					cout << "Ciclo Hamiltoniano: ";
+					for(int i = 0; i < VERTICES_MAXIMOS; i++) {
+						cout << solucao_ciclo_hamiltoniano[i]->id_vertice << ", ";
+					}
+					cout << endl << endl;
+				} else {
+					cout << "Nao eh um Grafo Hamiltoniano.\n\n";
+				}
+                
+                system("pause");
+            break;
+            case 5 :
                 system("cls");
-                cout << "OPCAO 5 - INFORMAR UM VERTICE E APRESENTAR SEUS ADJACENTES" << endl << endl;
 
-                if(leu1 == 1 && leu2 == 1){
-                    cout << "Informe o vertice: ";
-                    cin >> vertice;
-                    fflush(stdin);
+				GRAFO[0] = criaVertice('A');
+				GRAFO[1] = criaVertice('B');
+				GRAFO[2] = criaVertice('C');
+				GRAFO[3] = criaVertice('D');
+				GRAFO[4] = criaVertice('E');
 
-                    mostrarAdjacente(m, vertice, qtdVertices);
+				ligaVertices(GRAFO[0], GRAFO[1]);
+				ligaVertices(GRAFO[1], GRAFO[2]);
+				ligaVertices(GRAFO[2], GRAFO[3]);
+				ligaVertices(GRAFO[3], GRAFO[0]);
+				ligaVertices(GRAFO[0], GRAFO[4]);
+				ligaVertices(GRAFO[1], GRAFO[4]);
+				ligaVertices(GRAFO[2], GRAFO[4]);
 
-                    cout << endl;
-                }else if(leu1 == 1 && leu2 == 0)
-                    cout << "Insira ao menos uma aresta " << endl;
-                else
-                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
+				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
+				}
 
-                getchar();
-                break;
+				if(cicloHamiltoniano(GRAFO)) {
+					cout << "Eh um Grafo Hamiltoniano.\n\n";
 
-            case 6:
+					cout << "Ciclo Hamiltoniano: ";
+					for(int i = 0; i < VERTICES_MAXIMOS; i++) {
+						cout << solucao_ciclo_hamiltoniano[i]->id_vertice << ", ";
+					}
+					cout << endl << endl;
+				} else {
+					cout << "Nao eh um Grafo Hamiltoniano.\n\n";
+				}
+                
+                system("pause");
+            break;
+            case 6 :
                 system("cls");
-                cout << "OPCAO 6 - INFORMAR UM VERTICE E INFORMAR SEU GRAU" << endl << endl;
+              
+				GRAFO[0] = criaVertice('A');
+				GRAFO[1] = criaVertice('B');
+				GRAFO[2] = criaVertice('C');
+				GRAFO[3] = criaVertice('D');
+				GRAFO[4] = criaVertice('E');
+				GRAFO[5] = criaVertice('F');
 
-                if(leu1 == 1 && leu2 == 1){
-                    cout << "Informe o vertice: ";
-                    cin >> vertice;
-                    fflush(stdin);
+				ligaVertices(GRAFO[0], GRAFO[1]);
+				ligaVertices(GRAFO[1], GRAFO[2]);
+				ligaVertices(GRAFO[2], GRAFO[3]);
+				ligaVertices(GRAFO[3], GRAFO[4]);
+				ligaVertices(GRAFO[1], GRAFO[4]);
+				ligaVertices(GRAFO[4], GRAFO[5]);
 
-                    cout << endl;
+				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
+				}
 
-                    cout << "O grau do vertice " << vertice << " é: " << mostrarGrau(m, vertice, qtdVertices);
-
-                    cout << endl;
-                }else if(leu1 == 1 && leu2 == 0)
-                    cout << "Insira ao menos uma aresta " << endl;
-                else
-                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
-
-                getchar();
-                break;
-
-            case 7:
+				if(cicloHamiltoniano(GRAFO)) {
+					cout << "Eh um Grafo Hamiltoniano.\n\n";
+				} else {
+					cout << "Nao eh um Grafo Hamiltoniano.\n\n";
+				}
+                
+                system("pause");
+            break;
+            default:
                 system("cls");
-                cout << "OPCAO 7 - VERIFICAR SE O GRAFO E CONEXO" << endl << endl;
+                
+                cout << "Opcao invalida.\n\n";
+                
+                system("pause");
+            break;
+        };
+    } while(menu != 0);
 
-                if(leu1 == 1 && leu2 == 2){
-                    if((verificarConexo(m, qtdVertices) / 2) < qtdVertices - 1)
-                        cout << "\nGrafo nao e conexo";
-                    else
-                        cout << "\nGrafo conexo";
-                } else if(leu1 == 1 && leu2 == 0)
-                    cout << "Insira ao menos uma aresta " << endl;
-                else
-                    cout << "Execute a opcao 1 e 2 primeiro" << endl;
-
-                getchar();
-                break;
-
-            case 8:
-                system("cls");
-                cout << "OPCAO 8 - VERIFICAR SE O GRAFO E EULERIANO, SEMI-EULERIANO OU NAO" << endl << endl;
-                verificaEuleriano(m, qtdVertices);
-                getchar();
-                break;
-        }
-    }while(menu != 0);
-
+	return 0;
 }
-
-void inserirAresta(int m[][coluna], int vInicial, int vFinal){
-    m[vInicial][vFinal] = 1;
-    m[vFinal][vInicial] = 1;
-}
-
-void mostrar(int m[][coluna], int qtdVertices){
-    cout << "Matriz normal: " << endl;
-    for(int l = 0; l < qtdVertices; l++){
-        for(int c = 0; c < qtdVertices; c++){
-            cout << m[l][c] << "\t";
-        }
-        cout << endl;
-    }
-    cout << endl;
-}
-
-void removerAresta(int m[][coluna], int vInicial, int vFinal){
-    if(m[vInicial][vFinal] = 0){
-        cout << "A aresta informada nao existe" << endl;
-    }else{
-        m[vInicial][vFinal] = 0;
-        m[vFinal][vInicial] = 0;
-    }
-}
-
-void mostrarAdjacente(int m[][coluna], int vertice, int qtdVertices){
-   for(int l = 0; l < qtdVertices; l++){
-        if(l == vertice){
-            for(int c = 0; c < qtdVertices; c++){
-                    if(m[l][c] == 1)
-                        cout << c + 1 << ", ";
-            }
-        }
-    }
-}
-
-int mostrarGrau(int m[][coluna], int vertice, int qtdVertices){
-    int grau = 0;
-
-    for(int l = 0; l < qtdVertices; l++){
-        if(l == vertice){
-            for(int c = 0; c < qtdVertices; c++){
-                    if(m[l][c] == 1)
-                        grau++;
-            }
-        }
-    }
-
-    return grau;
-}
-
-int verificarConexo(int m[][coluna], int qtdVertices){
-    int cont = 0;
-    for(int l = 0; l < qtdVertices; l++){
-        for(int c = 0; c < qtdVertices; c++){
-            if(m[l][c] == 1)
-                cont++;
-        }
-    }
-    return cont;
-}
-
-//0-1; 1-2; 1-4; 2-3; 3-4; 4-5;
-
-void verificaEuleriano(int m[][coluna], int qtdVertices) {
-    int grau, grauPar = 0, grauImpar = 0;
-
-    for(int l = 0; l < qtdVertices; l++) {
-        grau = 0;
-        for(int c = 0; c < qtdVertices; c++) {
-            if(m[l][c] == 1)
-                grau++;
-        }
-        if(grau%2 == 0)
-            grauPar++;
-        else
-            grauImpar++;
-    }
-
-    if(grauImpar == 0)
-        cout << "O GRAFO E EULERIANO." << endl;
-    else if(grauImpar == 2)
-        cout << "O GRAFO E SEMI-EULERIANO." << endl;
-    else
-        cout << "O GRAFO NAO E EULERIANO." << endl;
-
-}
-
-void verificaHamiltoniano(int m[][coluna], int qtdVertices) {
-    int grau, grauPar = 0, grauImpar = 0;
-
-    for(int l = 0; l < qtdVertices; l++) {
-        grau = 0;
-        for(int c = 0; c < qtdVertices; c++) {
-            if(m[l][c] == 1)
-                grau++;
-        }
-        if(grau >= 2)
-            cout << "O GRAFO E HAMILTONIANO." << endl;
-        else
-            cout << "O GRAFO NAO E HAMILTONIANO." << endl;
-    }
-
-    if(grauImpar == 0)
-        cout << "O GRAFO E EULERIANO." << endl;
-    else if(grauImpar == 2)
-        cout << "O GRAFO E SEMI-EULERIANO." << endl;
-    else
-        cout << "O GRAFO NAO E EULERIANO." << endl;
-
-}
-
-/*
-int mostrarGrau(int m[][coluna], int vertice, int qtdVertices){
-    int grau = 0;
-
-    for(int l = 0; l < qtdVertices; l++){
-        if(l == vertice){
-            for(int c = 0; c < qtdVertices; c++){
-                    if(m[l][c] == 1)
-                        grau++;
-            }
-        }
-    }
-
-    return grau;
-}
-*/
