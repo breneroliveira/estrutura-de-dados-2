@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define VERTICES_MAXIMOS 7 // MÁXIMO DE VÉRTICES DO GRAFO, SE FOR ALTERAR O GRAFO PRECISA ALTERAR ESTA VARIÁVEL TAMBÉM
+#define VERTICES_MAXIMOS 5 // MÁXIMO DE VÉRTICES DO GRAFO, SE FOR ALTERAR O GRAFO PRECISA ALTERAR ESTA VARIÁVEL TAMBÉM
 
 // Estrutura que define cada Vértice do Grafo
 typedef struct NO {
@@ -12,7 +12,7 @@ typedef struct NO {
 	bool vertice_visitado;
 } *VERTICE;
 
-VERTICE solucao[VERTICES_MAXIMOS]; // Array que irá guardar a solução do ciclo hamiltoniano
+VERTICE solucao_ciclo_hamiltoniano[VERTICES_MAXIMOS]; // Array que irá guardar a solução do ciclo hamiltoniano
 
 // Cria Vértice e retorna
 VERTICE criaVertice(char id_vertice) {
@@ -45,20 +45,20 @@ bool ligaVertices(VERTICE v1, VERTICE v2) {
 bool cicloHamiltonianoAuxiliar(int aux) {
 
 	if(aux == VERTICES_MAXIMOS) {
-		for (int i = 0; i < solucao[aux-1]->numero_de_vizinhos; i++) {
-			if(solucao[aux-1]->vizinhos[i] == solucao[0]) {
+		for (int i = 0; i < solucao_ciclo_hamiltoniano[aux-1]->numero_de_vizinhos; i++) {
+			if(solucao_ciclo_hamiltoniano[aux-1]->vizinhos[i] == solucao_ciclo_hamiltoniano[0]) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	VERTICE s = solucao[aux-1]; // Auxiliar para simplificar o código
+	VERTICE s = solucao_ciclo_hamiltoniano[aux-1]; // Auxiliar para simplificar o código
 
 	for (int i = 0; i < s->numero_de_vizinhos; i++) { // Percorre todos os vizinhos do vértice de posição aux-1 no array solução
 		if(s->vizinhos[i]->vertice_visitado == false) {
 			s->vizinhos[i]->vertice_visitado = true;
-			solucao[aux] = s->vizinhos[i];
+			solucao_ciclo_hamiltoniano[aux] = s->vizinhos[i];
 			if(cicloHamiltonianoAuxiliar(aux+1) == true) {
 				return true;
 			}
@@ -71,8 +71,24 @@ bool cicloHamiltonianoAuxiliar(int aux) {
 
 bool cicloHamiltoniano(VERTICE grafo[VERTICES_MAXIMOS]) {
 	grafo[0]->vertice_visitado = true; // Marca a posição inicial como visitada
-	solucao[0] = grafo[0]; // Array que irá guardar a solução do ciclo
+	solucao_ciclo_hamiltoniano[0] = grafo[0]; // Array que irá guardar a solução do ciclo
 	return cicloHamiltonianoAuxiliar(1);
+}
+
+void verificaEuleriano(VERTICE GRAFO[VERTICES_MAXIMOS]) {
+	int cont_impar = 0;
+
+	for(int i = 0; i < VERTICES_MAXIMOS; i++) {
+		if(GRAFO[i]->numero_de_vizinhos%2 != 0)
+			cont_impar++;
+	}
+
+	if(cont_impar == 0)
+		cout << "Eh um Grafo Euleriano.\n\n";
+	else if(cont_impar == 2)
+		cout << "Eh um Grafo Semi-Euleriano.\n\n";
+	else
+		cout << "Nao eh um Grafo Euleriano.\n\n";
 }
 
 int main() {
@@ -97,15 +113,13 @@ int main() {
         cin >> menu;
         fflush(stdin);
 
-		int contImpar = 0;
+		int cont_impar = 0;
 
         switch(menu) {
             case 0 :
                 system("cls");
 
-                cout << "Programa finalizado.";
-
-                getchar();
+                cout << "Programa finalizado.\n";
 
             break;
             case 1 :
@@ -132,17 +146,7 @@ int main() {
 				ligaVertices(GRAFO[4], GRAFO[6]);
 				ligaVertices(GRAFO[5], GRAFO[6]);
 
-				for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-					if(GRAFO[i]->numero_de_vizinhos%2 != 0)
-						contImpar++;
-				}
-
-				if(contImpar == 0)
-					cout << "Eh um Grafo Euleriano.\n\n";
-				else if(contImpar == 2)
-					cout << "Eh um Grafo Semi-Euleriano.\n\n";
-				else
-					cout << "Nao eh um Grafo Euleriano.\n\n";
+				verificaEuleriano(GRAFO);
 
                 system("pause");
             break;
@@ -167,17 +171,7 @@ int main() {
 				ligaVertices(GRAFO[3], GRAFO[5]);
 				ligaVertices(GRAFO[4], GRAFO[5]);
 
-				for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-					if(GRAFO[i]->numero_de_vizinhos%2 != 0)
-						contImpar++;
-				}
-
-				if(contImpar == 0)
-					cout << "Eh um Grafo Euleriano.\n\n";
-				else if(contImpar == 2)
-					cout << "Eh um Grafo Semi-Euleriano.\n\n";
-				else
-					cout << "Nao eh um Grafo Euleriano.\n\n";
+				verificaEuleriano(GRAFO);
 
                 system("pause");
             break;
@@ -199,17 +193,7 @@ int main() {
 				ligaVertices(GRAFO[2], GRAFO[4]);
 				ligaVertices(GRAFO[3], GRAFO[4]);
 
-				for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-					if(GRAFO[i]->numero_de_vizinhos%2 != 0)
-						contImpar++;
-				}
-
-				if(contImpar == 0)
-					cout << "Eh um Grafo Euleriano.\n\n";
-				else if(contImpar == 2)
-					cout << "Eh um Grafo Semi-Euleriano.\n\n";
-				else
-					cout << "Nao eh um Grafo Euleriano.\n\n";
+				verificaEuleriano(GRAFO);
                 
                 system("pause");
             break;
@@ -233,13 +217,8 @@ int main() {
 				ligaVertices(GRAFO[1], GRAFO[3]);
 				ligaVertices(GRAFO[2], GRAFO[4]);
 
-				for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-					if(GRAFO[i]->numero_de_vizinhos%2 != 0)
-						contImpar++;
-				}
-
 				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
-					solucao[i] = criaVertice('0');
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
 				}
 
 				if(cicloHamiltoniano(GRAFO)) {
@@ -267,13 +246,8 @@ int main() {
 				ligaVertices(GRAFO[1], GRAFO[4]);
 				ligaVertices(GRAFO[2], GRAFO[4]);
 
-				for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-					if(GRAFO[i]->numero_de_vizinhos%2 != 0)
-						contImpar++;
-				}
-
 				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
-					solucao[i] = criaVertice('0');
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
 				}
 
 				if(cicloHamiltoniano(GRAFO)) {
@@ -301,13 +275,8 @@ int main() {
 				ligaVertices(GRAFO[1], GRAFO[4]);
 				ligaVertices(GRAFO[4], GRAFO[5]);
 
-				for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-					if(GRAFO[i]->numero_de_vizinhos%2 != 0)
-						contImpar++;
-				}
-
 				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
-					solucao[i] = criaVertice('0');
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
 				}
 
 				if(cicloHamiltoniano(GRAFO)) {
