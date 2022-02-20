@@ -2,48 +2,53 @@
 
 using namespace std;
 
-#define VERTICES_MAXIMOS 5 // MÁXIMO DE VÉRTICES DO GRAFO, SE FOR ALTERAR O GRAFO PRECISA ALTERAR ESTA VARIÁVEL TAMBÉM
+#define VERTICES_MAXIMOS 7 // Numero maximo de vertices (e necessario mudar conforme o teste realizado).
 
-// Estrutura que define cada Vértice do Grafo
 typedef struct NO {
 	char id_vertice;
 	int numero_de_vizinhos;
 	struct NO* vizinhos[VERTICES_MAXIMOS];
 	bool vertice_visitado;
-} *VERTICE;
+} *vertice;
 
-VERTICE solucao_ciclo_hamiltoniano[VERTICES_MAXIMOS]; // Array que irá guardar a solução do ciclo hamiltoniano
+vertice solucao_ciclo_hamiltoniano[VERTICES_MAXIMOS]; // Vetor que guarda o Ciclo Hamiltoniano.
 
-// Cria Vértice e retorna
-VERTICE criaVertice(char id_vertice) {
+// Cria vertice.
+vertice criaVertice(char id_vertice) {
 	NO *novoVertice = new NO();
+
 	novoVertice->id_vertice = id_vertice;
 	novoVertice->numero_de_vizinhos = 0;
 	novoVertice->vertice_visitado = false;
+
 	for (int i = 0; i < VERTICES_MAXIMOS; i++) {
 		novoVertice->vizinhos[i] = NULL;
 	}
+
 	return novoVertice;
 }
 
-// Liga os vértices passados como parâmetro
-bool ligaVertices(VERTICE v1, VERTICE v2) {
+// Liga os vertices (cria arestas).
+bool ligaVertices(vertice v1, vertice v2) {
 	int aux = 0;
-	while(v1->vizinhos[aux] != NULL) { // Busca a primeira posição 'vazia'(NULL) dos vizinhos
+
+	while(v1->vizinhos[aux] != NULL) { // Busca a primeira posição dos vizinhos.
 		aux++;
 	}
-	v1->vizinhos[aux] = v2; // Adiciona o novo vizinho a lista de vizinhos
+
+	v1->vizinhos[aux] = v2; // Adiciona o novo vizinho a lista de vizinhos.
 	aux = 0;
-	while(v2->vizinhos[aux] != NULL) { // Busca a primeira posição 'vazia'(NULL) dos vizinhos
+
+	while(v2->vizinhos[aux] != NULL) { // Busca a primeira posição dos vizinhos.
 		aux++;
 	}
-	v2->vizinhos[aux] = v1; // Adiciona o novo vizinho a lista de vizinhos
-	v1->numero_de_vizinhos++; // Incrementa o número de vizinhos
-	v2->numero_de_vizinhos++; // Incrementa o número de vizinhos
+
+	v2->vizinhos[aux] = v1; // Adiciona o novo vizinho a lista de vizinhos.
+	v1->numero_de_vizinhos++;
+	v2->numero_de_vizinhos++;
 }
 
 bool cicloHamiltonianoAuxiliar(int aux) {
-
 	if(aux == VERTICES_MAXIMOS) {
 		for (int i = 0; i < solucao_ciclo_hamiltoniano[aux-1]->numero_de_vizinhos; i++) {
 			if(solucao_ciclo_hamiltoniano[aux-1]->vizinhos[i] == solucao_ciclo_hamiltoniano[0]) {
@@ -53,15 +58,17 @@ bool cicloHamiltonianoAuxiliar(int aux) {
 		return false;
 	}
 
-	VERTICE s = solucao_ciclo_hamiltoniano[aux-1]; // Auxiliar para simplificar o código
+	vertice s = solucao_ciclo_hamiltoniano[aux-1]; // Variavel auxiliar.
 
-	for (int i = 0; i < s->numero_de_vizinhos; i++) { // Percorre todos os vizinhos do vértice de posição aux-1 no array solução
+	for (int i = 0; i < s->numero_de_vizinhos; i++) { // Percorre todos os vizinhos do vertice.
 		if(s->vizinhos[i]->vertice_visitado == false) {
 			s->vizinhos[i]->vertice_visitado = true;
 			solucao_ciclo_hamiltoniano[aux] = s->vizinhos[i];
+			
 			if(cicloHamiltonianoAuxiliar(aux+1) == true) {
 				return true;
 			}
+
 			s->vizinhos[i]->vertice_visitado = false;
 		}
 	}
@@ -69,17 +76,18 @@ bool cicloHamiltonianoAuxiliar(int aux) {
 	return false;
 }
 
-bool cicloHamiltoniano(VERTICE grafo[VERTICES_MAXIMOS]) {
-	grafo[0]->vertice_visitado = true; // Marca a posição inicial como visitada
-	solucao_ciclo_hamiltoniano[0] = grafo[0]; // Array que irá guardar a solução do ciclo
+bool cicloHamiltoniano(vertice grafo[VERTICES_MAXIMOS]) {
+	grafo[0]->vertice_visitado = true; // Marca a posicao inicial como visitada.
+	solucao_ciclo_hamiltoniano[0] = grafo[0]; // Vetor que guaradara a solucao do ciclo hamiltoniano.
+
 	return cicloHamiltonianoAuxiliar(1);
 }
 
-void verificaEuleriano(VERTICE GRAFO[VERTICES_MAXIMOS]) {
+void verificaEuleriano(vertice grafo[VERTICES_MAXIMOS]) {
 	int cont_impar = 0;
 
 	for(int i = 0; i < VERTICES_MAXIMOS; i++) {
-		if(GRAFO[i]->numero_de_vizinhos%2 != 0)
+		if(grafo[i]->numero_de_vizinhos%2 != 0) // Verifica o grau de cada vertice (numero de arestas). 
 			cont_impar++;
 	}
 
@@ -92,9 +100,7 @@ void verificaEuleriano(VERTICE GRAFO[VERTICES_MAXIMOS]) {
 }
 
 int main() {
-
-    // Grafo conjunto de vértices em um array
-	VERTICE GRAFO[VERTICES_MAXIMOS];
+	vertice grafo[VERTICES_MAXIMOS];
 
 	int menu = -1;
 
@@ -107,121 +113,120 @@ int main() {
         cout << "3 - Grafo Nao Euleriano (5 vertices);" << endl;
         cout << "4 - Grafo Hamiltoniano (5 vertices);" << endl;
         cout << "5 - Grafo Hamiltoniano (5 vertices);" << endl;
-        cout << "6 - Grafo Nao Hamiltoniano (6 vertices)." << endl;
+        cout << "6 - Grafo Nao Hamiltoniano (6 vertices);" << endl;
+        cout << "7 - Teste pessoal." << endl;
 
         cout << "\nEscolha um grafo para ser testado: ";
         cin >> menu;
         fflush(stdin);
 
-		int cont_impar = 0;
-
         switch(menu) {
-            case 0 :
+            case 0:
                 system("cls");
 
                 cout << "Programa finalizado.\n";
 
             break;
-            case 1 :
+            case 1:
                 system("cls");
                 
-				GRAFO[0] = criaVertice('A');
-				GRAFO[1] = criaVertice('B');
-				GRAFO[2] = criaVertice('C');
-				GRAFO[3] = criaVertice('D');
-				GRAFO[4] = criaVertice('E');
-				GRAFO[5] = criaVertice('F');
-				GRAFO[6] = criaVertice('G');
+				grafo[0] = criaVertice('A');
+				grafo[1] = criaVertice('B');
+				grafo[2] = criaVertice('C');
+				grafo[3] = criaVertice('D');
+				grafo[4] = criaVertice('E');
+				grafo[5] = criaVertice('F');
+				grafo[6] = criaVertice('G');
 
-				ligaVertices(GRAFO[0], GRAFO[1]);
-				ligaVertices(GRAFO[1], GRAFO[2]);
-				ligaVertices(GRAFO[2], GRAFO[3]);
-				ligaVertices(GRAFO[3], GRAFO[4]);
-				ligaVertices(GRAFO[4], GRAFO[5]);
-				ligaVertices(GRAFO[5], GRAFO[0]);
-				ligaVertices(GRAFO[1], GRAFO[5]);
-				ligaVertices(GRAFO[2], GRAFO[4]);
-				ligaVertices(GRAFO[1], GRAFO[6]);
-				ligaVertices(GRAFO[2], GRAFO[6]);
-				ligaVertices(GRAFO[4], GRAFO[6]);
-				ligaVertices(GRAFO[5], GRAFO[6]);
+				ligaVertices(grafo[0], grafo[1]);
+				ligaVertices(grafo[1], grafo[2]);
+				ligaVertices(grafo[2], grafo[3]);
+				ligaVertices(grafo[3], grafo[4]);
+				ligaVertices(grafo[4], grafo[5]);
+				ligaVertices(grafo[5], grafo[0]);
+				ligaVertices(grafo[1], grafo[5]);
+				ligaVertices(grafo[2], grafo[4]);
+				ligaVertices(grafo[1], grafo[6]);
+				ligaVertices(grafo[2], grafo[6]);
+				ligaVertices(grafo[4], grafo[6]);
+				ligaVertices(grafo[5], grafo[6]);
 
-				verificaEuleriano(GRAFO);
+				verificaEuleriano(grafo);
 
                 system("pause");
             break;
-            case 2 :
+            case 2:
                 system("cls");
                 
-				GRAFO[0] = criaVertice('A');
-				GRAFO[1] = criaVertice('B');
-				GRAFO[2] = criaVertice('C');
-				GRAFO[3] = criaVertice('D');
-				GRAFO[4] = criaVertice('E');
-				GRAFO[5] = criaVertice('F');
+				grafo[0] = criaVertice('A');
+				grafo[1] = criaVertice('B');
+				grafo[2] = criaVertice('C');
+				grafo[3] = criaVertice('D');
+				grafo[4] = criaVertice('E');
+				grafo[5] = criaVertice('F');
 
-				ligaVertices(GRAFO[0], GRAFO[1]);
-				ligaVertices(GRAFO[1], GRAFO[2]);
-				ligaVertices(GRAFO[2], GRAFO[3]);
-				ligaVertices(GRAFO[3], GRAFO[4]);
-				ligaVertices(GRAFO[4], GRAFO[0]);
-				ligaVertices(GRAFO[1], GRAFO[3]);
-				ligaVertices(GRAFO[0], GRAFO[5]);
-				ligaVertices(GRAFO[1], GRAFO[5]);
-				ligaVertices(GRAFO[3], GRAFO[5]);
-				ligaVertices(GRAFO[4], GRAFO[5]);
+				ligaVertices(grafo[0], grafo[1]);
+				ligaVertices(grafo[1], grafo[2]);
+				ligaVertices(grafo[2], grafo[3]);
+				ligaVertices(grafo[3], grafo[4]);
+				ligaVertices(grafo[4], grafo[0]);
+				ligaVertices(grafo[1], grafo[3]);
+				ligaVertices(grafo[0], grafo[5]);
+				ligaVertices(grafo[1], grafo[5]);
+				ligaVertices(grafo[3], grafo[5]);
+				ligaVertices(grafo[4], grafo[5]);
 
-				verificaEuleriano(GRAFO);
+				verificaEuleriano(grafo);
 
                 system("pause");
             break;
-            case 3 :
+            case 3:
                 system("cls");
               
-				GRAFO[0] = criaVertice('A');
-				GRAFO[1] = criaVertice('B');
-				GRAFO[2] = criaVertice('C');
-				GRAFO[3] = criaVertice('D');
-				GRAFO[4] = criaVertice('E');
+				grafo[0] = criaVertice('A');
+				grafo[1] = criaVertice('B');
+				grafo[2] = criaVertice('C');
+				grafo[3] = criaVertice('D');
+				grafo[4] = criaVertice('E');
 
-				ligaVertices(GRAFO[0], GRAFO[1]);
-				ligaVertices(GRAFO[1], GRAFO[2]);
-				ligaVertices(GRAFO[2], GRAFO[3]);
-				ligaVertices(GRAFO[3], GRAFO[0]);
-				ligaVertices(GRAFO[0], GRAFO[4]);
-				ligaVertices(GRAFO[1], GRAFO[4]);
-				ligaVertices(GRAFO[2], GRAFO[4]);
-				ligaVertices(GRAFO[3], GRAFO[4]);
+				ligaVertices(grafo[0], grafo[1]);
+				ligaVertices(grafo[1], grafo[2]);
+				ligaVertices(grafo[2], grafo[3]);
+				ligaVertices(grafo[3], grafo[0]);
+				ligaVertices(grafo[0], grafo[4]);
+				ligaVertices(grafo[1], grafo[4]);
+				ligaVertices(grafo[2], grafo[4]);
+				ligaVertices(grafo[3], grafo[4]);
 
-				verificaEuleriano(GRAFO);
+				verificaEuleriano(grafo);
                 
                 system("pause");
             break;
-            case 4 :
+            case 4:
                 system("cls");
               
-				GRAFO[0] = criaVertice('A');
-				GRAFO[1] = criaVertice('B');
-				GRAFO[2] = criaVertice('C');
-				GRAFO[3] = criaVertice('D');
-				GRAFO[4] = criaVertice('E');
+				grafo[0] = criaVertice('A');
+				grafo[1] = criaVertice('B');
+				grafo[2] = criaVertice('C');
+				grafo[3] = criaVertice('D');
+				grafo[4] = criaVertice('E');
 	
-				ligaVertices(GRAFO[0], GRAFO[1]);
-				ligaVertices(GRAFO[1], GRAFO[2]);
-				ligaVertices(GRAFO[2], GRAFO[3]);
-				ligaVertices(GRAFO[3], GRAFO[4]);
-				ligaVertices(GRAFO[4], GRAFO[0]);
-				ligaVertices(GRAFO[0], GRAFO[2]);
-				ligaVertices(GRAFO[0], GRAFO[3]);
-				ligaVertices(GRAFO[1], GRAFO[4]);
-				ligaVertices(GRAFO[1], GRAFO[3]);
-				ligaVertices(GRAFO[2], GRAFO[4]);
+				ligaVertices(grafo[0], grafo[1]);
+				ligaVertices(grafo[1], grafo[2]);
+				ligaVertices(grafo[2], grafo[3]);
+				ligaVertices(grafo[3], grafo[4]);
+				ligaVertices(grafo[4], grafo[0]);
+				ligaVertices(grafo[0], grafo[2]);
+				ligaVertices(grafo[0], grafo[3]);
+				ligaVertices(grafo[1], grafo[4]);
+				ligaVertices(grafo[1], grafo[3]);
+				ligaVertices(grafo[2], grafo[4]);
 
 				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
 					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
 				}
 
-				if(cicloHamiltoniano(GRAFO)) {
+				if(cicloHamiltoniano(grafo)) {
 					cout << "Eh um Grafo Hamiltoniano.\n\n";
 
 					cout << "Ciclo Hamiltoniano: ";
@@ -235,28 +240,28 @@ int main() {
                 
                 system("pause");
             break;
-            case 5 :
+            case 5:
                 system("cls");
 
-				GRAFO[0] = criaVertice('A');
-				GRAFO[1] = criaVertice('B');
-				GRAFO[2] = criaVertice('C');
-				GRAFO[3] = criaVertice('D');
-				GRAFO[4] = criaVertice('E');
+				grafo[0] = criaVertice('A');
+				grafo[1] = criaVertice('B');
+				grafo[2] = criaVertice('C');
+				grafo[3] = criaVertice('D');
+				grafo[4] = criaVertice('E');
 
-				ligaVertices(GRAFO[0], GRAFO[1]);
-				ligaVertices(GRAFO[1], GRAFO[2]);
-				ligaVertices(GRAFO[2], GRAFO[3]);
-				ligaVertices(GRAFO[3], GRAFO[0]);
-				ligaVertices(GRAFO[0], GRAFO[4]);
-				ligaVertices(GRAFO[1], GRAFO[4]);
-				ligaVertices(GRAFO[2], GRAFO[4]);
+				ligaVertices(grafo[0], grafo[1]);
+				ligaVertices(grafo[1], grafo[2]);
+				ligaVertices(grafo[2], grafo[3]);
+				ligaVertices(grafo[3], grafo[0]);
+				ligaVertices(grafo[0], grafo[4]);
+				ligaVertices(grafo[1], grafo[4]);
+				ligaVertices(grafo[2], grafo[4]);
 
 				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
 					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
 				}
 
-				if(cicloHamiltoniano(GRAFO)) {
+				if(cicloHamiltoniano(grafo)) {
 					cout << "Eh um Grafo Hamiltoniano.\n\n";
 
 					cout << "Ciclo Hamiltoniano: ";
@@ -270,32 +275,65 @@ int main() {
                 
                 system("pause");
             break;
-            case 6 :
+            case 6:
                 system("cls");
               
-				GRAFO[0] = criaVertice('A');
-				GRAFO[1] = criaVertice('B');
-				GRAFO[2] = criaVertice('C');
-				GRAFO[3] = criaVertice('D');
-				GRAFO[4] = criaVertice('E');
-				GRAFO[5] = criaVertice('F');
+				grafo[0] = criaVertice('A');
+				grafo[1] = criaVertice('B');
+				grafo[2] = criaVertice('C');
+				grafo[3] = criaVertice('D');
+				grafo[4] = criaVertice('E');
+				grafo[5] = criaVertice('F');
 
-				ligaVertices(GRAFO[0], GRAFO[1]);
-				ligaVertices(GRAFO[1], GRAFO[2]);
-				ligaVertices(GRAFO[2], GRAFO[3]);
-				ligaVertices(GRAFO[3], GRAFO[4]);
-				ligaVertices(GRAFO[1], GRAFO[4]);
-				ligaVertices(GRAFO[4], GRAFO[5]);
+				ligaVertices(grafo[0], grafo[1]);
+				ligaVertices(grafo[1], grafo[2]);
+				ligaVertices(grafo[2], grafo[3]);
+				ligaVertices(grafo[3], grafo[4]);
+				ligaVertices(grafo[1], grafo[4]);
+				ligaVertices(grafo[4], grafo[5]);
 
 				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
 					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
 				}
 
-				if(cicloHamiltoniano(GRAFO)) {
+				if(cicloHamiltoniano(grafo)) {
 					cout << "Eh um Grafo Hamiltoniano.\n\n";
+
+					cout << "Ciclo Hamiltoniano: ";
+					for(int i = 0; i < VERTICES_MAXIMOS; i++) {
+						cout << solucao_ciclo_hamiltoniano[i]->id_vertice << ", ";
+					}
+					cout << endl << endl;
 				} else {
 					cout << "Nao eh um Grafo Hamiltoniano.\n\n";
 				}
+                
+                system("pause");
+            break;
+			case 7:
+                system("cls");
+              
+				// Insira aqui neste case o seu grafo para testes.
+
+
+
+				for (int i = 0; i < VERTICES_MAXIMOS; i++) {
+					solucao_ciclo_hamiltoniano[i] = criaVertice('0');
+				}
+
+				if(cicloHamiltoniano(grafo)) {
+					cout << "Eh um Grafo Hamiltoniano.\n\n";
+
+					cout << "Ciclo Hamiltoniano: ";
+					for(int i = 0; i < VERTICES_MAXIMOS; i++) {
+						cout << solucao_ciclo_hamiltoniano[i]->id_vertice << ", ";
+					}
+					cout << endl << endl;
+				} else {
+					cout << "Nao eh um Grafo Hamiltoniano.\n\n";
+				}
+
+				verificaEuleriano(grafo);
                 
                 system("pause");
             break;
